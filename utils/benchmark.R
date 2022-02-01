@@ -1,11 +1,13 @@
 # Load all necessary librairies and setup parameters
-lib_list <- c('microbenchmark', 'purrr', 'matrixStats', 'expm', 'ggplot2', 'collections', 'stringi', 'stringr', 'Rfast', 'data.table', 'bench')
-for (lib in lib_list) suppressPackageStartupMessages(library(lib, character.only = T, quietly = T, warn.conflicts = F))
+lib_list <- c('microbenchmark', 'purrr', 'matrixStats', 'expm', 'ggplot2', 'collections', 'stringi', 'stringr', 
+              'Rfast', 'data.table', 'bench', 'brio', 'fastmatch', 'collapse', 'kit')
+for (lib in lib_list) suppressPackageStartupMessages(library(lib, character.only = T, quietly = T, warn.conflicts = FALSE))
+F <- FALSE
 options(scipen = 50)
 setDTthreads(11L)
 
 
-year <- '2020'
+year <- '2021'
 files <- list.files(year, '.R$', full.names = T)
 exprs <- map(files, ~parse(file=.x)) # Read and parse all source code files
 exp <- bquote(eval(f)) # Create an empty eval() instruction
@@ -33,4 +35,4 @@ f <- paste0(folder, '/' ,maxd,'_V',iter,'.csv')
 # Write time to keep track of improvements
 fwrite(times2, f)
 
-pri('Total time: ', sum(times2$median)) # Total executtion time
+pri('Total time: ', sum(times2$median)) # Total execution time

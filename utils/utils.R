@@ -1,20 +1,21 @@
 #' @export
-fp <- \(y, d) file.path(y, 'inputs', paste0('day', d, '.txt'))
+fp <- \(y, d) .Internal(paste0(list(y, '/inputs/day', d, '.txt'), NULL, FALSE))
 
 #' @export
-rfp <- \(y, d,...) readLines(fp(y,d),warn=F, ...)
+rfp <- \(y, d,...) brio::read_lines(fp(y,d), ...)
+# rfp <- \(y, d,...) readLines(fp(y,d),warn=F, ...)
+
+#' @export
+sfp <- \(y, d,...) scan(fp(y,d),quiet=T, ...)
 
 #' @export
 toGrid <- \(a, w=0, int=T, sep='') {
-  spl <- strsplit(a, sep)
+  spl <- strsplit(a, sep, fixed = T)
   if(!w) w <- length(spl[[1]])
   spl <- unlist(spl)
   if(int) spl <- strtoi(spl)
   matrix(spl, ncol = w, byrow = T)
 }
-
-#' @export
-sfp <- \(y, d,...) scan(fp(y,d),quiet=T, ...)
 
 #' @export
 setup <- \(y,d) {
@@ -40,12 +41,20 @@ setup <- \(y,d) {
   p2 <- file.path(y, paste0('day',  stringi::stri_pad(d, 2, pad = 0), '_', title, '.R'))
   if(!file.exists(p2)) {
     file.create(p2)
-    code <- paste0('a <- rfp(', y, ',', d, ')')
+    code <- paste0("a <- rfp('", y, "','", d, "')")
     f2 <- base::file(p2)
-    on.exit(try(close(2),silent=T))
+    on.exit(try(close(f2),silent=T))
     writeLines(code, f2)
-    try(close(2),silent=T)
+    try(close(f2),silent=T)
   }
   rstudioapi::navigateToFile(p2)
   utils::browseURL(url)
+}
+
+#' @export
+bench_file <- \(file, memory = F, min_time=1, ...) {
+  f <- parse(file=file)
+  exp <- bquote(eval(f))
+  exp[[2]] <- f
+  bench::mark(exprs = list(exp), memory = memory, min_time=min_time, env=new.env(parent = parent.frame()), ...)[,c(2:9)]
 }
