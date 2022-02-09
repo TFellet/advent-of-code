@@ -12,9 +12,58 @@ sfp <- \(y, d,...) scan(fp(y,d),quiet=T, ...)
 toGrid <- \(a, w=0, int=T, sep='') {
   spl <- strsplit(a, sep, fixed = T)
   if(!w) w <- length(spl[[1]])
-  spl <- unlist(spl)
+  spl <- unlist(spl,use.names = F)
   if(int) spl <- strtoi(spl)
   matrix(spl, ncol = w, byrow = T)
+}
+
+#' @export
+radsort <- \(x, by=x, ...) x[collapse::radixorderv(by, ...)]
+
+#' @export
+frepEach <- \(x,n) {
+  m <- matrix(x,nrow = n, ncol=length(x),byrow = T)
+  dim(m) <- NULL
+  m
+}
+
+#' @export
+adja <- \(mat, pad=NA, n=4L) {
+  mat2 <- seq_along(mat)
+  dim(mat2) <- dim(mat)
+  mat.pad <- unname(rbind(pad, cbind(pad, mat2, pad), pad)) # Add padding arround matrix
+  ind_row <- 2:(nrow(mat) + 1) # row indices of the "middle"
+  ind_col <- 2:(ncol(mat) + 1) # column indices of the "middle"
+  # Find neighbours in n directions, clockwise, starting from North or row by row for n = 9
+  neigh <- 
+    if(n==4L)
+      cbind(mat.pad[ind_row-1,ind_col  ], # N
+            mat.pad[ind_row  ,ind_col+1], # E
+            mat.pad[ind_row+1,ind_col  ], # S
+            mat.pad[ind_row  ,ind_col-1]) # W
+    else if (n==8L)
+      cbind(mat.pad[ind_row-1,ind_col  ], # N  
+            mat.pad[ind_row-1,ind_col+1], # NE
+            mat.pad[ind_row  ,ind_col+1], # E
+            mat.pad[ind_row+1,ind_col+1], # SE
+            mat.pad[ind_row+1,ind_col  ], # S
+            mat.pad[ind_row+1,ind_col-1], # SW
+            mat.pad[ind_row  ,ind_col-1], # W
+            mat.pad[ind_row-1,ind_col-1]) # NW
+    else if(n==9L)
+      cbind(mat.pad[ind_row-1,ind_col-1], # NW
+            mat.pad[ind_row-1,ind_col  ], # N
+            mat.pad[ind_row-1,ind_col+1], # NE
+            mat.pad[ind_row  ,ind_col-1], # W
+            mat.pad[ind_row  ,ind_col  ], # Origin
+            mat.pad[ind_row  ,ind_col+1], # E
+            mat.pad[ind_row+1,ind_col-1], # SW
+            mat.pad[ind_row+1,ind_col  ], # S
+            mat.pad[ind_row+1,ind_col+1]) # SE
+    else stop('Invalid n')
+  
+  dim(neigh) <- c(length(mat), n) # Reshape matrix to have (n points in original matrix) * (4 directions)
+  neigh
 }
 
 #' @export

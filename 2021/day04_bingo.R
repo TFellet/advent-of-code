@@ -1,32 +1,38 @@
 library(data.table)
 library(matrixStats)
-n <- scan(fp(2021,4), 0L,sep=',', nlines = 1, quiet=T) # Bingo rolls
-# a <- collapse::qM(fread(fp(2021,4),skip=2, blank.lines.skip = T, sep=' ')) # Bingo grids
-a <- matrix(scan(fp(2021,4), 0L,skip=2, quiet=T),ncol=5,byrow = T) # Bingo grids
 
-ch <- \(m) { sum(c(rowSums2(m), colSums2(m)) == -5) } # Check if grid has won
+n <- stringi::stri_split_fixed(rfp('2021','4',n=1L), ',')[[1]] |> strtoi() # Bingo rolls
+a <- sfp('2021','4', 0L,skip=2)
+score <- \(grid, i) sum(grid[grid!=-1]*i)
 
-p1 <- \(b) {
+bingo <- \(a, n) {
+  d3 <- length(a)%/%25L # Number of grids
+  grids_row <- array(a, dim=c(5,5,d3)) # Convert input to 3d array
+  grids_col <- aperm(grids_row, c(2,1,3)) # Transpose array column wise
+  score_p1 <- 0L
+  loosings <- rep(T, d3)
+  
   for (i in n) { # Draw a number
-    b[b==i] <- -1 # Mark corresponding number in the grids
-    for (j in seq(1,nrow(b),by=5)) { # For the first line of each grid 
-      m <- b[j:(j+4),] # Get grid
-      if(ch(m)) return(sum(m[m!=-1])*i) # If grid won, return score
+    collapse::setv(grids_row, i, -1L)  # Mark corresponding number in the grids
+    collapse::setv(grids_col, i, -1L)
+    wins <- c(collapse::whichv(colSums2(grids_row, dim. = c(5,d3*5)),-5L),
+              collapse::whichv(colSums2(grids_col, dim. = c(5,d3*5)),-5L)) # Indices of wins
+    
+    loosings[((wins-1L) %/% 5L + 1L)] <- F # Update loosing boards
+    
+    if(sum(loosings) == 1L) last <- which.max(loosings) # Remember index of last loosing grid
+    if(sum(loosings) == 0L) { # When last grid looses
+      gridp2 <- grids_col[,,last] # Get it
+      score_p2 <- score(gridp2, i) # Compute score
+      break
+    }
+    
+    if(!score_p1 && length(wins)) { # First win
+      grid_w <- grids_col[,,((min(wins)-1L) %/% 5L)+1L] # Find winning grid
+      score_p1 <- score(grid_w, i) # Score of winning grid
     }
   }
+  c(score_p1, score_p2)
 }
-p1(a) # 14.68 ms
-
-p2 <- \(b) {
-  w <- seq(1,nrow(b),by=5) # Id of first line of each grid
-  wb <- rep_len(T,length(w)) # Boolean if grid is still loosing
-  for (i in n) { # Draw a number
-    b[b==i] <- -1 # Mark corresponding number in the grids
-    for (j in w[wb]) { # For each grid still loosing
-      m <- b[j:(j+4),] # Get grid
-      if(ch(m)) wb[((j+4)/5)] <- F # If grid won, remove from loosing list
-      if(sum(wb) == 0) return(sum(m[m!=-1])*i) # If all the grids are loosing, return score of the last one
-    }
-  }
-}
-p2(a) # 34.1 ms
+bingo(a,n)
+# 1.97ms

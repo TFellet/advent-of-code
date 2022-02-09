@@ -1,15 +1,11 @@
-library(collections)
-library(purrr)
+a <- rfp('2021','24')
+n2 <- stringi::stri_sub(a, 7L) # Number 2
 
-a <- rfp(2021,24)
-n2 <- substr(a,7,nchar(a)) # Number 2
-
-comnums <- ((seq_along(n2)-1L)%%18L) # Operation ids
 w <- 1L:9L # Possible inputs
-check <- n2[comnums == 5] |> as.integer() # First useful line
-offset <- n2[comnums == 15] |> as.integer() # Second useful line
-st <- stack() 
-digits <- list()
+check <- n2[seq.int(6,by=18,length.out=14)] |> as.integer() # First useful line
+offset <- n2[seq.int(16,by=18,length.out=14)] |> as.integer() # Second useful line
+st <- collections::stack() 
+digits <- vector('list',14)
 for (i in 1:14) { # For each of the 14 inputs
   if (check[i]>0) { # If check is positive, add number to stack
     st$push(list(i, offset[i]))
@@ -23,5 +19,4 @@ for (i in 1:14) { # For each of the 14 inputs
     digits[[i]] <- range(inp_prev[equal])
   }
 }
-map_chr(digits, 2) |> paste0(collapse = '')
-map_chr(digits, 1) |> paste0(collapse = '')
+stringi::stri_join_list(data.table::transpose(digits)) # Part 1 & 2: Min and max possible numbers 

@@ -1,11 +1,15 @@
 library(stringi)
-a <- strsplit(rfp(2021,16), '')[[1]]
+a <- strsplit(rfp('2021','16'), '',fixed=T)[[1]]
+
 hex <- setNames(c('0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111', '1000', '1001', '1010', '1011', '1100', '1101', '1110', '1111'),
                 c('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'))
 
-b <- paste0(hex[a], collapse = '') # Convert hexa to binary
+b <- stri_flatten(hex[a]) # Convert hexa to binary
 
-dec <- \(x) {s <- as.numeric(strsplit(x,'')[[1]]);sum(s*2^seq(length(s)-1,0))} # Convert part of string to decimal
+dec <- \(x) {
+  if(stri_length(x) > 31L) {s <- strtoi(strsplit(x,'')[[1]]);sum(s*2^seq(length(s)-1,0))}
+  else strtoi(x,2L)
+} # Convert part of string to decimal
 
 operator <- \(nums, type) { # Possible operations
   switch (type+1,
@@ -30,7 +34,7 @@ decode <- \(ignored=0L) {
     }
     res <- dec(lit) # Return complete literal
   } else { # Operator packet
-    lid <- as.integer(readS(bits, 1)) # Type of length
+    lid <- strtoi(readS(bits, 1)) # Type of length
     rloop <- c() # Store recursive results
     if(lid==0L) { # Type 1: Number of bits to read
       len <- dec(readS(bits, 15)) # Number of bits to read

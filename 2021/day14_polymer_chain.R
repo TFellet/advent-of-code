@@ -1,32 +1,32 @@
-library(data.table)
 library(expm) # Matrix exponents
 options(scipen = 50)
 
-temp <- strsplit(fread(fp(2021,14),nrows = 1,header = F)[[1]],'')[[1]] # Read polymer template
-rules <- fread(fp(2021,14),skip=2,header = F,select = c(1,3)) # Read pairing rules
+file <- rfp('2021','14')
+temp <- strsplit(file[1],'',fixed=T)[[1]]
+rulesl <- data.table::tstrsplit(file[-(1:2)], ' ', keep = c(1,3))
+rules <- list(inp = rep(rulesl[[1]],2))
+rules[['out']] <- c(paste0(substr(rulesl[[1]],1,1),rulesl[[2]]), paste0(rulesl[[2]], substr(rulesl[[1]],2,2)))
 
-# Change rules from AB -> C to (AB -> AC / AB -> BC)
-rules <- rbind(rules[,.(inp=V1, out=paste0(substr(V1,1,1),V3))], rules[,.(inp=V1, out=paste0(V3, substr(V1,2,2)))])
-setkey(rules, inp) # Index on rules
-
-# Create all pairs presents in polymer and sum them
-poly <- data.table(inp=paste0(head(temp,-1),tail(temp,-1)))[,.(N = as.double(.N)),keyby=inp]
+un <- radsort(unique(c(rules$inp, rules$out))) # All unique pairs present
+poly <- Rfast::Table(paste0(head(temp,-1),tail(temp,-1))) # Starting pairs
+start <- setNames(rep(0,length(un)), un) # Empty vector with all combinasons of letters
+start[names(poly)] <- poly # Assign numbers from input
 
 ### Matrix version 223 µs on 40 steps | 397 µs on 1000 steps
-un <- sort(unique(c(rules$inp, rules$out))) # All unique pairs present
 m <- array(0,rep(length(un),2), list(un,un)) # Matrix to keep track of associations
-m[(match(rules$inp, un)-1)*nrow(m) + match(rules$out, un)] <- 1 # Add the rules to the matrix
-start <- setNames(rep(0,length(un)), un) # Empty vector with all combinasons of letters
-start[poly$inp] <- poly$N # Assign numbers from input
+m[(fastmatch::fmatch(rules$inp, un)-1)*nrow(m) + fastmatch::fmatch(rules$out, un)] <- 1 # Add the rules to the matrix
 
-count <- \(l) sum(end[grepl(l, names(end))]) + end[grepl(paste0(l,l), names(end))] # Function to count twice each letter
+countEnd <- \(end) {
+  let <- unlist(strsplit(names(end), '',fixed=T)) # All letters from pairs
+  nbs <- frepEach(end,2) # Repeat each end number twice (1 for each letter of the pair)
+  counts <- ceiling(collapse::fsum(nbs, g=let)/2L) # Sum number of letters present
+  max(counts) - min(counts) # Most frequent - least frequent
+}
 
 # Part 1
 end <- (m %^% 10 %*% start)[,1] # Find pairs presents after 40 steps
-quant <- sapply(unique(substr(names(end),1,1)), count)/2 # Apply above function on each letter
-floor(max(quant) - min(quant))# Difference between min and max
+countEnd(end)
 
 # Part 2
 end <- (m %^% 40 %*% start)[,1] # Find pairs presents after 40 steps
-quant <- sapply(unique(substr(names(end),1,1)), count)/2 # Apply above function on each letter
-floor(max(quant) - min(quant))# Difference between min and max
+countEnd(end)
