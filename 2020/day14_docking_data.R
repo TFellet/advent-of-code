@@ -39,7 +39,7 @@ for (i in seq_along(a)) {
 }
 
 resn <- binToNum(collapse::qM(data.table::transpose(di$values()))) # Convert binary numbers to decimal
-sum(resn) # Part 1: Sum of values in memory
+sum(resn) # Part 1 (7997531787333): Sum of values in memory
 
 toDec <- \(s) sum(s*2^seq(length(s)-1,0)) # Convert single number to decimal
 
@@ -76,5 +76,4 @@ for (i in seq_along(a)) {
   idmem <- idmem + new_vals
 }
 # Find last value for each memory adress
-sum(values[!kit::fduplicated(memory, fromLast = T)]) # Part 2: Sum of all memory values
-# 3564822193820
+sum(values[!kit::fduplicated(memory, fromLast = T)]) # Part 2 (3564822193820): Sum of all memory values

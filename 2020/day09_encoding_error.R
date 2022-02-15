@@ -11,7 +11,7 @@ findInvalid <- function(a, k = 25) {
   }
 }
 
-goal <- findInvalid(a) # Part 1: First number 'goal' where 2 numbers in previous 25 cannot add up to 'goal'
+goal <- findInvalid(a) # Part 1 (217430975): First number 'goal' where 2 numbers in previous 25 cannot add up to 'goal'
 goal
 
 findGoal <- \(a, goal) {
@@ -19,7 +19,7 @@ findGoal <- \(a, goal) {
   reve <- cumsum(rev(a)) # Reverse sum
   m <- fastmatch::fmatch(fw, (fw[length(fw)] - reve - goal), nomatch = 0L) # Find where forward sum can equal total sum - reverse sum - goal
   start <- which.max(m) # Sequence start
-  end <- length(a) - m[start]
-  sum(range(a[(start+1L):end]))
+  end <- length(a) - m[start] # Sequence end
+  sum(range(a[(start+1L):end])) # Sum of min and max of sequence
 }
-findGoal(a,goal)
+findGoal(a,goal) # Part 2 (28509180): Sum of min and max of sequence that add up to goal

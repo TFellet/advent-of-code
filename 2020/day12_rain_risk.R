@@ -12,6 +12,7 @@ moves[lf] <- rot_all[lf]*num[lf] # Forward moves the ship in the direction it is
 ship_end <- sum(moves) # Add all moves to get final position of the ship
 abs(Re(ship_end))+abs(Im(ship_end)) # Part 1 (759): Manhattan distance of the ship from the origin
 
+# Put part 2 in a function to force compile loop
 p2 <- \() {
   way <- 1L+10i # Initial waypoint position
   ship <- 0i # Initial ship position

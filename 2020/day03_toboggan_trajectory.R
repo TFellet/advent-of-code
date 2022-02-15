@@ -9,5 +9,5 @@ ntrees <- \(r, d) {
   sum(substr(a[coor_y], coor_x, coor_x) == '#') # Check if coordinates == #
 }
 trees <- mapply(ntrees, r=r, d=d) # Find number of trees on each slope
-trees[1] # Part 1: Number of trees on the first slope
-prod(trees) # Part 2: Product of the number of trees on all slopes
+trees[1] # Part 1 (151): Number of trees on the first slope
+prod(trees) # Part 2 (7540141059): Product of the number of trees on all slopes

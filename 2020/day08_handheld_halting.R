@@ -23,7 +23,7 @@ loop <- \(vals, accl, jmp, p1=F) {
 }
 res <- loop(vals, acc, jmp, T)
 path <- res[[2]] # Get list of visited values
-res[[1]] # Part 1: Accumulator value before repeating an operation
+res[[1]] # Part 1 (1782): Accumulator value before repeating an operation
 
 findGoal <- \(jmp, vals, path) {
   # Only find jmp to nop changes
@@ -44,4 +44,4 @@ goal <- findGoal(jmp, vals, path)
 jmp2 <- jmp
 jmp2[goal] <- !jmp2[goal] # Change the jmp to nop
 
-loop(vals, acc, jmp2) # Part 2: Accumulator value when program ends
+loop(vals, acc, jmp2) # Part 2 (797): Accumulator value when program ends

@@ -26,7 +26,7 @@ solve <- \(b, look, lim_occup=4L) {
   }
   sum(b)
 }
-solve(b, look) # Part 1: Total of occupied seats
+solve(b, look) # Part 1 (2275): Total of occupied seats
 
 # Function to find neighbours indices in 8 directions of all points in matrix
 # If there is no adjacent neighbour, look further until it is found
@@ -66,5 +66,4 @@ adjaFar <- \(mat, valid, pad=0L) {
 }
 lookFar <- adjaFar(b, valid, pad=which.min(valid)) # Find far neighbours
 
-solve(b, lookFar, lim_occup=5L) # Part 2: Total of occupied seats
-# 71ms
+solve(b, lookFar, lim_occup=5L) # Part 2 (2121): Total of occupied seats

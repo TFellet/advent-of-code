@@ -6,7 +6,7 @@ buses <- strtoi(buses[times+1L]) # Keep only valid buses
 
 wait <- abs(t %% buses - buses) # Waiting time after timestamp for each bus
 bus <- which.min(wait) # Find minimum wait time
-buses[bus]*wait[bus] # Part 1: Min wait time * bus id
+buses[bus]*wait[bus] # Part 1 (174): Min wait time * bus id
 
 start <- 0 # Start of sequences
 prods <- cumprod(buses)
@@ -18,4 +18,4 @@ for (i in 2:length(buses)) { # For each bus from 2
   seqn <- seq(start, end, by) # Sequence from first possible number to maximum possible number
   start <- seqn[which.max((seqn+difft)%%buses[i]==0)] # Find first valid number in sequence
 }
-start # Part 2: First time where buses pass at correct invervals
+start # Part 2 (780601154795940): First time where buses pass at correct invervals

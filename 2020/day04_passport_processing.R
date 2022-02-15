@@ -5,7 +5,7 @@ abid <- stri_split_fixed(a, '\n\n')[[1]] # Split on each passport
 
 fields <- c('byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid') # Fields to find
 b <- lapply(fields, stri_detect_fixed, str=abid) |> Reduce(f=`&`) # Find all fields
-sum(b) # Part 1: Passports with all fields present
+sum(b) # Part 1 (228): Passports with all fields present
 
 patterns <- c(
   "byr:19[2-9].|200[0-2]",
@@ -18,4 +18,4 @@ patterns <- c(
 ) # Rules on each field
 patterns <- paste0(patterns, '(\n| |$)')
 matchs <- lapply(patterns, stri_detect_regex, str=abid[b]) |> Reduce(f=`&`) # Apply regex on each field
-sum(matchs) # Part 2: Passports with all fields corrects
+sum(matchs) # Part 2 (175): Passports with all fields corrects

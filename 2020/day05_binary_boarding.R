@@ -4,5 +4,5 @@ rows <- substr(b, 1,7) |> strtoi(2) # Convert rows to binary
 cols <- substr(b, 8,10) |> strtoi(2) # Convert columns to binary
 ids <- rows*8L+cols # Compute seat ids
 minid <- min(ids); maxid <- max(ids)
-maxid # Part 1: max seat id
-sum(minid:maxid) - sum(ids) # Part 2: missing seat
+maxid # Part 1 (998): max seat id
+sum(minid:maxid) - sum(ids) # Part 2 (676): missing seat

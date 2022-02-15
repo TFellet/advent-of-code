@@ -25,7 +25,7 @@ part1 <- \(b, first='shiny gold') {
   }
   sum(bags_ends) 
 }
-part1(b) # Part 1: How many bag colors can eventually contain at least one shiny gold bag
+part1(b) # Part 1 (337): How many bag colors can eventually contain at least one shiny gold bag
 
 part2 <- \(ref, first='shiny gold') {
   colors <- ref[[first]]
@@ -36,4 +36,4 @@ part2 <- \(ref, first='shiny gold') {
   }
   total
 }
-part2(full_list) # Part 2: How many individual bags are required inside your single shiny gold bag
+part2(full_list) # Part 2 (50100): How many individual bags are required inside your single shiny gold bag
