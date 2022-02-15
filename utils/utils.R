@@ -18,13 +18,21 @@ toGrid <- \(a, w=0, int=T, sep='') {
 }
 
 #' @export
-radsort <- \(x, by=x, ...) x[collapse::radixorderv(by, ...)]
+radsort <- \(x, by=x, ...) x[collapse::radixorder(by, ...)]
 
 #' @export
 frepEach <- \(x,n) {
   m <- matrix(x,nrow = n, ncol=length(x),byrow = T)
   dim(m) <- NULL
   m
+}
+
+#' @export
+matToInt <- \(mat) {
+  d <- dim(mat)
+  mat <- strtoi(mat)
+  dim(mat) <- d
+  mat
 }
 
 #' @export
