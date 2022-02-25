@@ -36,6 +36,18 @@ matToInt <- \(mat) {
 }
 
 #' @export
+`%=%` <- collapse::`%=%` # Multiple assign
+
+#' @export
+fDT <- \(...) collapse::qDT(list(...))
+
+#' @export
+countFilter <- \(x,val) {
+  tmp <- kit::countOccur(x)
+  tmp$Variable[tmp$Count == val]
+}
+
+#' @export
 adja <- \(mat, pad=NA, n=4L) {
   mat2 <- seq_along(mat)
   dim(mat2) <- dim(mat)
@@ -114,4 +126,19 @@ bench_file <- \(file, memory = F, min_time=1, ...) {
   exp <- bquote(eval(f))
   exp[[2]] <- f
   bench::mark(exprs = list(exp), memory = memory, min_time=min_time, env=new.env(parent = parent.frame()), ...)[,c(2:9)]
+}
+
+#' @export
+getRustSo <- \(name, ...) {
+  folder <- file.path(tools::R_user_dir("cargo", "cache"), 'roxido', 'rustlib', 'target', 'release')
+  files <- list.files(folder, 'so$', full.names = T) |> file.info()
+  last_file <- rownames(files)[which.max(files$mtime)]
+  file.copy(last_file, name, ...)
+}
+
+#' @export
+importDll <- \(lib_path, fun_name = 'func') {
+  dll <- dyn.load(lib_path) # Load previously compiled code
+  func <- getNativeSymbolInfo(fun_name, tools::file_path_sans_ext(basename(lib_path))) # Get function name in library
+  \(...) .Call(func, ...) # Return R function
 }

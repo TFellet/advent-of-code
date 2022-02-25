@@ -7,7 +7,7 @@ options(scipen = 50)
 setDTthreads(11L)
 
 
-year <- '2021'
+year <- '2020'
 files <- list.files(year, '.R$', full.names = T)
 exprs <- map(files, ~parse(file=.x)) # Read and parse all source code files
 exp <- bquote(eval(f)) # Create an empty eval() instruction
