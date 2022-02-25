@@ -1,28 +1,34 @@
 a <- strsplit(rfp('2020','15'),',',fixed=T)[[1]] |> strtoi()
 
-rustPlay <- importDll('2020/day15_rustlib.so') # Get function name in library
-rustPlay(a, 2020L) # Part 1 (536): Last spoken number after 2020 turns
-rustPlay(a, 3e7L) # Part 2 (24065124): Last spoken number after 30 millions turns
+if(!(exists('onlyR') && onlyR)) {
 
+  rustPlay <- importDll('2020/day15_rambunctious_recitation.so') # Get function name in library
+  rustPlay(a, 2020L) # Part 1 (536): Last spoken number after 2020 turns
+  rustPlay(a, 3e7L) # Part 2 (24065124): Last spoken number after 30 millions turns
+
+} else {
+  
 ##### R optimized function #####
 # This R function runs in about 3 sec
 # Since this is a simple bruteforce challenge, custom low level code is authorized
-# play <- compiler::cmpfun(function(x, turns) {
-#   l <- length(x)
-#   diff_time <- collapse::alloc(0L,turns) # Init large enough array to store last spoken turns
-#   diff_time[x] <- seq_along(x) # Init firsts turns
-#   last <- x[l] # Last number spoken
-#   for (turn in (l+1L):turns) { # Simulate each turn
-#     tmp <- last # Keep track of last number spoken
-#     # Next spoken number is either the turn difference between the previous 2 times it was spoken, or 0 is it's a new number
-#     last <- if (diff_time[tmp] != 0L) turn - diff_time[tmp] else 1L
-#     diff_time[tmp] <- turn-1L # Store turn spoken of previous number
-#   }
-#   last-1L # Returns spoken number after X turns (all data was shifted by 1 to adapt to R arrays)
-# })
+  play <- compiler::cmpfun(function(x, turns) {
+    l <- length(x)
+    diff_time <- collapse::alloc(0L,turns) # Init large enough array to store last spoken turns
+    diff_time[x] <- seq_along(x) # Init firsts turns
+    last <- x[l] # Last number spoken
+    for (turn in (l+1L):turns) { # Simulate each turn
+      tmp <- last # Keep track of last number spoken
+      # Next spoken number is either the turn difference between the previous 2 times it was spoken, or 0 is it's a new number
+      last <- if (diff_time[tmp] != 0L) turn - diff_time[tmp] else 1L
+      diff_time[tmp] <- turn-1L # Store turn spoken of previous number
+    }
+    last-1L # Returns spoken number after X turns (all data was shifted by 1 to adapt to R arrays)
+  })
+  
+  play(a+1L, 2020L) # 187µs
+  play(a+1L, 3e7L) # 3.14s
 
-# play(a+1L, 2020L) # 187µs
-# play(a+1L, 3e7L) # 3.14s
+}
 
 ##### Rust code #####
 # Runs in 415ms
@@ -54,4 +60,3 @@ rustPlay(a, 3e7L) # Part 2 (24065124): Last spoken number after 30 millions turn
 # Rcpp::sourceCpp("2020/day15_rambunctious_recitation.cpp")
 # rcppPlay(a, 2020L) # 6.5µs
 # rcppPlay(a, 3e7L) # 440ms
-

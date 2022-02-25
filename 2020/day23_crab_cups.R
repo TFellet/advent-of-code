@@ -15,51 +15,55 @@ createNxt <- \(input, size) {
 
 # Once again on a pure bruteforce challenge, low level code is used
 # R version runs in 2.6 sec while Rust version runs in 200ms
-dll <- dyn.load('2020/day23_crab_cups.so') # Load previously compiled code
-Rust_rustGame <- getNativeSymbolInfo('func', 'day23_crab_cups') # Get function name in library
+if(!(exists('onlyR') && onlyR)) {
+  
+  rgame <- importDll('2020/day23_crab_cups.so')
+  
+  rustGame <- \(input, turns, size=9L) { # Create a R function from commpiled code
+    nxt <- createNxt(input, size) # Create array of neighbours
+    rgame(input, nxt, turns, size) # Call compiled code
+  }
+  
+  nxtp1 <- rustGame(a, 100) # Get neighbour array after 100 iterations
+  resp1 <- nxtp1[2L] # Neighbour of 1
+  for(j in 2:8) resp1[j] <- nxtp1[resp1[j-1L]+1L] # Find neighbour of each value after neighbour of 1
+  strtoi(paste0(resp1,collapse = '')) # Part 1 (97342568): Order of cups after the cup labeled 1
+  
+  nxtp2 <- rustGame(a, 1e7, 1e6) # Get neighbours after 10 millions turns on a 1 million cups circle
+  nxtp2[2L]*1*nxtp2[nxtp2[2L]+1L] # Part 2 (902208073192): Product of 2 cups after cup labeled 1
 
-rustGame <- \(input, turns, size=9L) { # Create a R function from commpiled code
-  nxt <- createNxt(input, size) # Create array of neighbours
-  .Call(Rust_rustGame, input, nxt, turns, size) # Call compiled code
-}
-
-nxtp1 <- rustGame(a, 100) # Get neighbour array after 100 iterations
-resp1 <- nxtp1[2L] # Neighbour of 1
-for(j in 2:8) resp1[j] <- nxtp1[resp1[j-1L]+1L] # Find neighbour of each value after neighbour of 1
-strtoi(paste0(resp1,collapse = '')) # Part 1 (97342568): Order of cups after the cup labeled 1
-
-nxtp2 <- rustGame(a, 1e7, 1e6) # Get neighbours after 10 millions turns on a 1 million cups circle
-nxtp2[2L]*1*nxtp2[nxtp2[2L]+1L] # Part 2 (902208073192): Product of 2 cups after cup labeled 1
-
+} else {
 
 ##### Base R version #####
-# game <- \(input, turns, size=9L) {
-#   nxt <- createNxt(input, size)[-1L] # Create neighbours array and remove padding
-#   curr_id <- 1L # First current index
-#   maxval <- size # Max value to loop under 1
-#   curr_val <- input[curr_id] # First current value
-# 
-#   for (i in 1:turns) { # Each turn
-#     pick1 <- nxt[curr_val] # Pick neighbour of value
-#     pick2 <- nxt[pick1] # Pick 2nd neighbour
-#     pick3 <- nxt[pick2] # Pick 3rd neighbour
-# 
-#     dest_val <- if(curr_val == 1L) maxval else curr_val-1L # Get destination (and loop if necessary)
-#     while (dest_val == pick1 || dest_val == pick2 || dest_val == pick3) { # If destination is picked up
-#       dest_val <- if(dest_val == 1L) maxval else dest_val-1L} # Go 1 below and loop if necessary
-#     nxt[curr_val] <- nxt[pick3] # New neighbour of current value is the neighbour of 3rd picked up cup
-#     nxt[pick3] <- nxt[dest_val] # New neighbour of 3rd cup is neighbour of destination
-#     nxt[dest_val] <- pick1 # New neighbour of destination is 1st cup
-#     curr_val <- nxt[curr_val] # New current value is neighbour of current cup
-#   }
-#   nxt
-# }
-# resp1 <- game(a, 100) |> ti() # 30.8µs vs 3.06µs in Rust
-# v <- 1L;for(j in 1:8) cat(v <- resp1[v]) # 97342568
-# 
-# resp2 <- game(a, 1e7, 1e6) # 2.63s vs 194ms in Rust
-# resp2[1L] * 1 * resp2[resp2[1L]] #902208073192
-
+  game <- \(input, turns, size=9L) {
+    nxt <- createNxt(input, size)[-1L] # Create neighbours array and remove padding
+    curr_id <- 1L # First current index
+    maxval <- size # Max value to loop under 1
+    curr_val <- input[curr_id] # First current value
+  
+    for (i in 1:turns) { # Each turn
+      pick1 <- nxt[curr_val] # Pick neighbour of value
+      pick2 <- nxt[pick1] # Pick 2nd neighbour
+      pick3 <- nxt[pick2] # Pick 3rd neighbour
+  
+      dest_val <- if(curr_val == 1L) maxval else curr_val-1L # Get destination (and loop if necessary)
+      while (dest_val == pick1 || dest_val == pick2 || dest_val == pick3) { # If destination is picked up
+        dest_val <- if(dest_val == 1L) maxval else dest_val-1L} # Go 1 below and loop if necessary
+      nxt[curr_val] <- nxt[pick3] # New neighbour of current value is the neighbour of 3rd picked up cup
+      nxt[pick3] <- nxt[dest_val] # New neighbour of 3rd cup is neighbour of destination
+      nxt[dest_val] <- pick1 # New neighbour of destination is 1st cup
+      curr_val <- nxt[curr_val] # New current value is neighbour of current cup
+    }
+    nxt
+  }
+  nxtp1 <- game(a, 100) # 30.8µs vs 3.06µs in Rust
+  resp1 <- nxtp1[1L] # Neighbour of 1
+  for(j in 1:7) resp1[j+1] <- nxtp1[resp1[j]] # Find neighbour of each value after neighbour of 1
+  strtoi(paste0(resp1,collapse = '')) # Part 1 (97342568): Order of cups after the cup labeled 1
+  
+  resp2 <- game(a, 1e7, 1e6) # 2.63s vs 194ms in Rust
+  resp2[1L] * 1 * resp2[resp2[1L]] #902208073192
+}
 ##### Rust code #####
 # crabCupsRust <- cargo::rust_fn(input, nxt2, turns, size, '
 #     // Parse inputs

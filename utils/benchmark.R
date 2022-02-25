@@ -8,6 +8,7 @@ setDTthreads(11L)
 
 
 year <- '2020'
+onlyR <- F
 files <- list.files(year, '.R$', full.names = T)
 exprs <- map(files, ~parse(file=.x)) # Read and parse all source code files
 exp <- bquote(eval(f)) # Create an empty eval() instruction
@@ -27,6 +28,7 @@ times2[,c('result', 'memory', 'gc', 'time', 'gc/sec', 'n_gc') := NULL]
 # Find next file name to add
 # Pattern is d{pad]{max_day}_V{version number in max_day}
 folder <- paste0(year, '/benchs/times')
+if(onlyR) folder <- paste0(folder, 'R')
 pad <- if(length(exprs)>=10) '' else '0'
 maxd <- paste0('d', pad,length(exprs))
 iter <- length(list.files(folder, pattern = maxd))+1L
