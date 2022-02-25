@@ -1,5 +1,6 @@
 library(data.table)
 
+ss <- collapse::ss
 a <- sfp('2020','20', '')
 tid <- which(a == 'Tile') # Separation between each tile
 tiles <- list()
@@ -10,18 +11,21 @@ for (i in seq_along(tid)) { # At each separation
 
 bord <- tiles |> lapply(\(m) {
   # Generate each possible border from a tile
-  list(m[1,], rev(m[1,]), m[,1], rev(m[,1]), m[10,], rev(m[10,]), m[,10], rev(m[,10])) |> lapply(paste0, collapse='')
+  list(m[1,], rev(m[1,]), m[,1], rev(m[,1]), m[10,], rev(m[10,]), m[,10], rev(m[,10])) |> 
+    lapply(stringi::stri_flatten)
 })
 possibles_dirs <- c('un', 'uf', 'ln', 'lf', 'dn', 'df', 'rn', 'rf') # Operations to get borders above
-tmp <- data.table(bord)[,N:=.I] # Store borders in a data table with index in tiles list
+tmp <- fDT(bord, N=seq_along(bord)) # Store borders in a data table with index in tiles list
 # For each tile, store the 8 possibles borders
 dt <- tmp[,.(N = rep(N, each=8), id = as.integer(rep(substr(a[(tid+1)],1,4), each=8)), 
              dir=rep_len(possibles_dirs, nrow(tmp)*8), bord = unlist(bord))]
 
 # Self join dt to find all matching borders
-dtj <- dt[dt,on=.(bord == bord),c(.SD, .(i.N=i.N, i.dir=i.dir, i.id=i.id)), nomatch = 0][id!=i.id]
-corners <- dtj[,.N,by=.(id)][N==4] # Corners have 2 matches + 2 matches flipped
-prod(corners$id) # Part 1 (79412832860579): Product of the 4 corner tiles
+dtj <- dt[dt,on=c('bord'),c(.SD, .(i.N=i.N, i.dir=i.dir, i.id=i.id)), nomatch = 0]
+dtj <- ss(dtj, dtj$id!=dtj$i.id) # Remove identical ids
+
+corners <- countFilter(dtj$id, 4L) # Corners have 2 matches + 2 matches flipped = present 4 times
+prod(corners) # Part 1 (79412832860579): Product of the 4 corner tiles
 
 # Function to put the desired border of a matrix at the top
 getRotation <- \(mat, rot) {
@@ -45,10 +49,10 @@ starts <- seq.int(1,by=8,length.out=len)
 ends <- seq.int(8,by=8,length.out=len)
 bmat <- list() # 2D list to store each tile in image
 
-setkey(dtj, id)
-setkey(dt, bord)
-# First tile is the corner having borders down and right without flip
-first <- dtj[.(dtj[corners][dir %in% c('dn', 'rn')][,.N,by=.(id)][N==2,id])][dir=='dn']
+# First corner have 2 borders, down and right
+corner_id <- ss(dtj$id, dtj$id %in% corners & dtj$dir %chin% c('dn', 'rn')) |> countFilter(2L)
+first <- ss(dtj, dtj$id == corner_id & dtj$dir=='dn') # First border is down (fill order of final matrix)
+
 cur_mat <- tiles[[first$N]] # First tile
 
 bmat[[1]] <- list()
@@ -62,15 +66,15 @@ for (j in 1:len) { # Columns
       if(j==1) next # Skip first cell
       prev <- bmat[[j-1]][[i]] # Find tile on the left instead of top
       prev_id <- mat[i,j-1]
-      prev_bord <- paste0(prev[,10], collapse = '') # Adjacent border to match
-      cur <- dt[bord == prev_bord & id != prev_id] # Find matching border
+      prev_bord <- stringi::stri_flatten(prev[,10]) # Adjacent border to match
+      cur <- ss(dt, dt$bord == prev_bord & dt$id != prev_id) # Find matching border
       cur_mat <- getRotation(tiles[[cur$N]], cur$dir) |> getRotation('ln') # Get tile with correct rotation
       bmat[[j]] <- list()
     } else {
       prev <- bmat[[j]][[i-1]] # Get tile above current
       prev_id <- mat[i-1,j]
-      prev_bord <- paste0(prev[10,], collapse = '')
-      cur <- dt[bord == prev_bord & id != prev_id]
+      prev_bord <- stringi::stri_flatten(prev[10,])
+      cur <- ss(dt, dt$bord == prev_bord & dt$id != prev_id)
       cur_mat <- getRotation(tiles[[cur$N]], cur$dir)
     }
     # Store necessary informations
@@ -79,7 +83,6 @@ for (j in 1:len) { # Columns
     mat_final[starts[i]:ends[i],starts[j]:ends[j]] <- cur_mat[2:9,2:9]
   }
 }
-
 mat_pat <- mat_final=='#' # Convert final matrix to boolean matrix
 mat_found <- array(T,dim(mat_pat)) # Matrix to remove found patterns
 pattern <- toGrid(rfp('2020', '20_pattern'),int=F)=='#' # Convert pattern to boolean

@@ -1,9 +1,8 @@
 a <- strsplit(rfp('2020','15'),',',fixed=T)[[1]] |> strtoi()
 
-dll <- dyn.load('2020/day15_rustlib.so') # Load previously compiled code
-rustPlay <- getNativeSymbolInfo('func', 'day15_rustlib') # Get function name in library
-.Call(rustPlay, a, 2020L) # Part 1 (536): Last spoken number after 2020 turns
-.Call(rustPlay, a, 3e7L) # Part 2 (24065124): Last spoken number after 30 millions turns
+rustPlay <- importDll('2020/day15_rustlib.so') # Get function name in library
+rustPlay(a, 2020L) # Part 1 (536): Last spoken number after 2020 turns
+rustPlay(a, 3e7L) # Part 2 (24065124): Last spoken number after 30 millions turns
 
 ##### R optimized function #####
 # This R function runs in about 3 sec

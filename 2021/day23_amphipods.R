@@ -61,8 +61,8 @@ solve <- \(p2 = F, example = F) {
     vss <- colSums2(matrix(!corrects[unlist(valids)],ncol=4))+(n*0L:3L)+11L # Destination of each type of pod
     
     ids2 <-  which(occup[12:length(occup)] & !corrects[12:length(corrects)])-1L # Pods in rooms
-    # ids2[ids2-shift(ids2,fill=50) != 1 | ids2%%n == 0]+12L |> ti(1000000)
-    # !((ids2+12L)-1L) %in% ids | ids2%%n == 0 |> ti(1000000)
+    # ids2[ids2-shift(ids2,fill=50) != 1 | ids2%%n == 0]+12L
+    # !((ids2+12L)-1L) %in% ids | ids2%%n == 0
     ids2 <- ids2[ids2-shift(ids2,fill=50) != 1 | ids2%%n == 0]+12L # Remove pods with pods above them
     ids <- c(ids, ids2)
     

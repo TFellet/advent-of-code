@@ -17,5 +17,5 @@ patterns <- c(
   "pid:\\d{9}"
 ) # Rules on each field
 patterns <- paste0(patterns, '(\n| |$)')
-matchs <- lapply(patterns, stri_detect_regex, str=abid[b]) |> Reduce(f=`&`) # Apply regex on each field
+matchs <- lapply(patterns, grepl, x=abid[b], perl=T) |> Reduce(f=`&`) # Apply regex on each field
 sum(matchs) # Part 2 (175): Passports with all fields corrects

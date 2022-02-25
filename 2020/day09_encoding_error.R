@@ -17,7 +17,7 @@ goal
 findGoal <- \(a, goal) {
   fw <- cumsum(a) # Forward sum
   reve <- cumsum(rev(a)) # Reverse sum
-  m <- fastmatch::fmatch(fw, (fw[length(fw)] - reve - goal), nomatch = 0L) # Find where forward sum can equal total sum - reverse sum - goal
+  m <- fmatch(fw, (fw[length(fw)] - reve - goal), nomatch = 0L) # Find where forward sum can equal total sum - reverse sum - goal
   start <- which.max(m) # Sequence start
   end <- length(a) - m[start] # Sequence end
   sum(range(a[(start+1L):end])) # Sum of min and max of sequence
