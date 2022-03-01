@@ -22,7 +22,7 @@ expand <- \(str, rules) {
     str_spl <- stri_split_fixed(str, ' ')[[1]] # Split on each space
     # Replace ids by their rules when possible and collapse result strings to a single string
     str <- stri_flatten(data.table::fcoalesce(rules[strtoi(str_spl)], str_spl), collapse = ' ')
-    continue <- grepl('\\d', str) # Keep looping while there are numbers
+    continue <- grepl('\\d', str, perl = T) # Keep looping while there are numbers
   }
   stri_c('^', stri_replace_all_fixed(str, ' ', ''), '$') # Remove spaces and add start / end of str in regex
 }

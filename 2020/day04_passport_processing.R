@@ -16,6 +16,6 @@ patterns <- c(
   "ecl:(amb|blu|brn|gry|grn|hzl|oth)",
   "pid:\\d{9}"
 ) # Rules on each field
-patterns <- paste0(patterns, '(\n| |$)')
+patterns <- stri_c(patterns, '(\n| |$)')
 matchs <- lapply(patterns, grepl, x=abid[b], perl=T) |> Reduce(f=`&`) # Apply regex on each field
 sum(matchs) # Part 2 (175): Passports with all fields corrects

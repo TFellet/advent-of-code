@@ -55,6 +55,7 @@ first <- ss(dtj, dtj$id == corner_id & dtj$dir=='dn') # First border is down (fi
 
 cur_mat <- tiles[[first$N]] # First tile
 
+##### Assemble final matrix #####
 bmat[[1]] <- list()
 bmat[[1]][[1]] <- cur_mat
 mat[1,1] <- first$id # Store first tile id
@@ -83,21 +84,28 @@ for (j in 1:len) { # Columns
     mat_final[starts[i]:ends[i],starts[j]:ends[j]] <- cur_mat[2:9,2:9]
   }
 }
+
+##### Find pattern #####
+stop <- F # Only a single rotation contains pattern. Stop when it is found
 mat_pat <- mat_final=='#' # Convert final matrix to boolean matrix
 mat_found <- array(T,dim(mat_pat)) # Matrix to remove found patterns
-pattern <- toGrid(rfp('2020', '20_pattern'),int=F)=='#' # Convert pattern to boolean
-pattern_list <- lapply(possibles_dirs, getRotation, mat=pattern) # Generate every possible pattern
+mat_str <- apply(mat_final, 1, stringi::stri_flatten) # List of strings used to filter rows faster
+pattern_str <- toGrid(rfp('2020', '20_pattern')|> stringi::stri_trans_char(' ', '.'),int=F) # Regex pattern
+pattern <- pattern_str=='#' # Convert pattern to boolean
 s <- sum(pattern) # Goal to find
-stop <- F # Only a single rotation contains pattern. Stop when it is found
-
-for (x in seq_along(pattern_list)) { # For each pattern
-  pattern_d <- pattern_list[[x]] # Get pattern with rotation
-  rp <- nrow(pattern_d)-1L
-  cp <- ncol(pattern_d)-1L
-  for (i in 1:(nrow(mat_pat)-rp)) { # Possible rows
-    for (j in 1:(ncol(mat_pat)-cp)) { # Possible cols
-      idxi <- i:(i+rp) # Rows to search
-      idxj <- j:(j+cp) # Columns to search
+for (x in possibles_dirs) {
+  pattern_reg <- apply(getRotation(pattern_str, x), 1, stringi::stri_flatten) # Rotated pattern regex
+  pattern_d <- getRotation(pattern, x) # Rotated boolean pattern
+  pat_poss <- rep(T, nrow(mat_pat)-length(pattern_reg)+1) # Possibles lines to try
+  for (id in seq_along(pattern_reg)) # For each row in the pattern
+    # Remove lines where pattern is not present
+    pat_poss <- pat_poss & grepl(pattern_reg[id], mat_str[(0+id):(length(mat_str)-(length(pattern_reg)-id))])
+  for (i in which(pat_poss)) {
+    cp <- nchar(pattern_reg[1])-1L # Pattern width
+    idxi <- i:(i+length(pattern_reg)-1L) # Rows to search (pattern height)
+    jbase <- 0L:cp # Possible columns
+    for (j in 1:(ncol(mat_pat)-cp)) {
+      idxj <- jbase+j # Columns to search
       found <- sum(mat_pat[idxi,idxj] & pattern_d) == s # Try to find pattern
       if(found) {
         mat_found[idxi,idxj] <- !pattern_d # Remove pattern from matrix
@@ -107,4 +115,5 @@ for (x in seq_along(pattern_list)) { # For each pattern
   }
   if(stop) break
 }
+
 sum(mat_found & mat_pat) # Part 2 (2155): Number of # not in a pattern
