@@ -1,5 +1,5 @@
 library(data.table)
-a <- fread(fp(2021,12),sep='-',header=F)
+a <- fread(fp('2021','12'),sep='-',header=F)
 a <- rbind(a, a[,.(V2,V1)],use.names=F)[V2 != 'start' & V1 != 'end'] # Duplicate connexions and filter useless entries
 
 lastName <- \(dt) tail(names(dt),1)
@@ -43,7 +43,8 @@ while(nrow(b) > 0) { # While there is paths to explore
   ends <- b[[last]] == 'end' # Paths ending
   if(sum(ends) > 0) {
     paths <- paths + sum(ends)
-    b <- b[!ends]
+    b <- collapse::ss(b, !ends)
+    setkeyv(b, lastName(b))
   }
   if(ncol(b) > 4) {
     last_col <- tolower(b[[last]]) # Last column
@@ -55,4 +56,4 @@ while(nrow(b) > 0) { # While there is paths to explore
     b <- b[filter <= 1] # Remove invalid paths
   }
 }
-paths
+paths # 118803

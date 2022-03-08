@@ -1,13 +1,12 @@
 library(expm) # Matrix exponents
-options(scipen = 50)
 
 file <- rfp('2021','14')
 temp <- strsplit(file[1],'',fixed=T)[[1]]
-rulesl <- data.table::tstrsplit(file[-(1:2)], ' ', keep = c(1,3))
+rulesl <- data.table::tstrsplit(file[-(1:2)], ' ', keep = c(1,3), fixed=T)
 rules <- list(inp = rep(rulesl[[1]],2))
-rules[['out']] <- c(paste0(substr(rulesl[[1]],1,1),rulesl[[2]]), paste0(rulesl[[2]], substr(rulesl[[1]],2,2)))
+rules[['out']] <- c(stringi::stri_c(substr(rulesl[[1]],1,1),rulesl[[2]]), stringi::stri_c(rulesl[[2]], substr(rulesl[[1]],2,2)))
 
-un <- radsort(unique(c(rules$inp, rules$out))) # All unique pairs present
+un <- radsort(kit::funique(c(rules$inp, rules$out))) # All unique pairs present
 poly <- Rfast::Table(paste0(head(temp,-1),tail(temp,-1))) # Starting pairs
 start <- setNames(rep(0,length(un)), un) # Empty vector with all combinasons of letters
 start[names(poly)] <- poly # Assign numbers from input

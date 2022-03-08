@@ -1,11 +1,12 @@
+library(fastmatch)
 a <- rfp(2021,15)
 am <- toGrid(a)
 
 # Duplicate a grid 5 times on the right and down
 repGrid <- \(m) {
-  s <- nrow(m); full <- matrix(0L, nrow = s*5,ncol = s*5) # Init variables and matrix
-  for (i in 0:4) { for (j in 0:4) full[(i*s+1):((i+1)*s),(j*s+1):((j+1)*s)] <- m+i+j} # Generate duplicates
-  full[full >= 10L] <- full[full >= 10L] - 9L;full # Change values above 10
+  full <- rbind(m-1L, m, m+1L, m+2L, m+3L)
+  full2 <- cbind(full, full+1L, full+2L, full+3L, full+4L)%%9L
+  collapse::setop(full2,'+',1L)
 }
 
 ### Fast vectorized Dijkstra
@@ -16,29 +17,25 @@ findPath <- function(maze) {
   to <- nrow(maze) * ncol(maze) # Destination = last cell
   tbv <- rep(T, length(maze)) # Cells to be visited
   parent <- integer() # Current cells
+  look <- adja(maze, 0L) # Find all possibles neighbours of all cells in the matrix
   
-  # Function to find neighbours of a cell
-  adja <- \(x,l){xl=x%%l;xpl=x+l;c(ifelse(xl!=1L,x-1L,0L),ifelse(xl!=0L,x+1L,0L),x-l,ifelse(xpl>l^2,0L,xpl))}
-  # Find all possibles neighbours of all cells in the matrix
-  look <- matrix(adja(seq_along(maze), l), nrow=4,byrow = T)
-  
-  while (!to %in% parent) {
+  while (!(to %in% parent)) {
     cur_risk <- min(risk_vec) # Minimum risk in queue
-    idx <- risk_vec == cur_risk # Indexes of min risks in queue
-    parent <- unique(queue[idx]) # Indexes of min values in matrix
+    idx <- collapse::whichv(risk_vec, cur_risk) # Indexes of min risks in queue
+    parent <- kit::funique(queue[idx]) # Indexes of min values in matrix
     tbv[parent] <- F # Mark parent as visited
-    nei <- unlist(look[,parent]) # All neighbour of all values being visited
+    nei <- unlist(look[parent,]) # All neighbour of all values being visited
     nei <- nei[nei>0] # Filter invalid neighbours
     nei <- nei[tbv[nei]] # Keep neighbour to be visited
     risk <- maze[nei] # Risk of all neighbour
-    idx2 <- queue %in% parent # remove explored from queue
+    idx2 <- queue %fin% parent # remove explored from queue
     risk_vec <-  c(risk_vec[!idx2], cur_risk + risk) # Risk vector => unused values and visited values + risk of neighbours
     queue <- c(queue[!idx2], nei) # Indexes of values from risk vec
   }
   return(cur_risk)
 }
+
 findPath(am)
 full <- repGrid(am)
 findPath(full)
 # Full = 2855 iterations / value of 2876
-

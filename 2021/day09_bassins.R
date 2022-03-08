@@ -16,5 +16,5 @@ while(any(mg < 9L)) { # While all points are not in a bassin or a limit (9)
   idx <- maxs > 10L # When a bassin is found
   mg[mg9[idx]] <- maxs[idx] # Assign bassin id
 }
-bas2 <- kit::countOccur(mg[mg>10L]) # Count points in each bassin
-prod(kit::topn(bas2$Count, 3L, hasna = F, index = F)) # Product of top 3 bassins
+bas2 <- tabulate(mg[mg>10L]) # Count points in each bassin
+prod(kit::topn(bas2, 3L, hasna = F, index = F)) # Product of top 3 bassins
