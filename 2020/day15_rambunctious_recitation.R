@@ -33,23 +33,23 @@ if(!(exists('onlyR') && onlyR)) {
 ##### Rust code #####
 # Runs in 415ms
 # rustPlay <- cargo::rust_fn(x, turns, '
-#     let x = x.slice_integer().unwrap(); # Declare data as Rust array
-#     let turns = turns.as_usize(); # Declare turns as Rust number
+#     let x = x.slice_integer().unwrap(); // Declare data as Rust array
+#     let turns = turns.as_usize(); // Declare turns as Rust number
 #     let l = x.len();
-#     let mut diff_time: Vec<i32> = Vec::new(); # Vector to store last spoken turns of each number
-#     diff_time.resize(turns, 0); # Resize to fit all turns
+#     let mut diff_time: Vec<i32> = Vec::new(); // Vector to store last spoken turns of each number
+#     diff_time.resize(turns, 0); // Resize to fit all turns
 #     for i in 0..l {
-#         diff_time[x[i] as usize] = i as i32 +1; # Init firsts turns
+#         diff_time[x[i] as usize] = i as i32 +1; // Init firsts turns
 #     }
-#     let mut last = x[l-1] as usize; # Last spoken number
+#     let mut last = x[l-1] as usize; // Last spoken number
 #     let mut tmp;
-#     for turn in l as i32 ..turns as i32 { # For each turn
-#         tmp = last; # Keep track of last number spoken
-#         # Next spoken number is either the turn difference between the previous 2 times it was spoken, or 0 is it's a new number
+#     for turn in l as i32 ..turns as i32 { // For each turn
+#         tmp = last; // Keep track of last number spoken
+#         // Next spoken number is either the turn difference between the previous 2 times it was spoken, or 0 is it\'s a new number
 #         last = if diff_time[tmp]>0 { (turn - diff_time[tmp]) as usize } else { 0 };
-#         diff_time[tmp] = turn; # Store turn spoken of previous number
+#         diff_time[tmp] = turn; // Store turn spoken of previous number
 #     }
-#     return Rval::new(last as i32, &mut pc); # Returns spoken number after X turns
+#     return Rval::new(last as i32, &mut pc); // Returns spoken number after X turns
 # ', verbose=T)
 # rustPlay(a, 2020L) # 4.37µs
 # rustPlay(a, 3e7L) # 414ms
