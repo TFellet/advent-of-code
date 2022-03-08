@@ -21,6 +21,9 @@ toGrid <- \(a, w=0, int=T, sep='') {
 radsort <- \(x, by=x, ...) x[collapse::radixorder(by, ...)]
 
 #' @export
+fTable <- \(x) attr(.Call(collapse:::C_group, x, F, T), 'group.sizes', T)
+
+#' @export
 frepEach <- \(x,n) {
   m <- matrix(x,nrow = n, ncol=length(x),byrow = T)
   dim(m) <- NULL
