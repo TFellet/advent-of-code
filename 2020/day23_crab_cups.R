@@ -19,7 +19,7 @@ if(!(exists('onlyR') && onlyR)) {
   
   rgame <- importDll('2020/day23_crab_cups.so')
   
-  rustGame <- \(input, turns, size=9L) { # Create a R function from commpiled code
+  rustGame <- \(input, turns, size=9L) { # Create a R function from compiled code
     nxt <- createNxt(input, size) # Create array of neighbours
     rgame(input, nxt, turns, size) # Call compiled code
   }

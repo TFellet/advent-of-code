@@ -5,6 +5,11 @@ if(!(exists('onlyR') && onlyR)) {
   rustPlay <- importDll('2020/day15_rambunctious_recitation.so') # Get function name in library
   rustPlay(a, 2020L) # Part 1 (536): Last spoken number after 2020 turns
   rustPlay(a, 3e7L) # Part 2 (24065124): Last spoken number after 30 millions turns
+  # Rcpp::sourceCpp("2020/day15_rambunctious_recitation.cpp", dryRun = T, verbose = T, rebuild = T)
+  # Rcpp::sourceCpp("2020/day15_rambunctious_recitation.cpp", dryRun = F, verbose = T, rebuild = T)
+  # rustPlay(a, 3e7L) |> ti(rep = 10)
+  # rcppPlay(a, 3e7L) |> ti(rep = 10) # clang = 400ms (brancheless)
+  # rcppPlay(a, 3e7L) |> ti(rep = 10) # g++ = 430ms
 
 } else {
   
@@ -24,7 +29,7 @@ if(!(exists('onlyR') && onlyR)) {
     }
     last-1L # Returns spoken number after X turns (all data was shifted by 1 to adapt to R arrays)
   })
-  
+
   play(a+1L, 2020L) # 187µs
   play(a+1L, 3e7L) # 3.14s
 
@@ -49,7 +54,7 @@ if(!(exists('onlyR') && onlyR)) {
 #         last = if diff_time[tmp]>0 { (turn - diff_time[tmp]) as usize } else { 0 };
 #         diff_time[tmp] = turn; // Store turn spoken of previous number
 #     }
-#     return Rval::new(last as i32, &mut pc); // Returns spoken number after X turns
+#     return Rval::new(last as i32, pc); // Returns spoken number after X turns
 # ', verbose=T)
 # rustPlay(a, 2020L) # 4.37µs
 # rustPlay(a, 3e7L) # 414ms

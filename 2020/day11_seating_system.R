@@ -20,7 +20,7 @@ solve <- \(b, look, lim_occup=4L) {
     nei <- matrixStats::rowSums2(nei, dim. = dims) # Sum the number of neighbour presents
     add <- valid & nei == 0L & b == 0L # Where people will be seating
     sub <- valid & nei >= lim_occup & b == 1L # Where people will leave
-    continue <- any(add) | any(sub) # If there is movement, continue
+    continue <- any(add) || any(sub) # If there is movement, continue
     b[add] <- 1L # Add people where needed
     b[sub] <- 0L # Remove people where needed
   }

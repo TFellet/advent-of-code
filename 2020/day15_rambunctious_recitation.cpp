@@ -12,7 +12,8 @@ int rcppPlay(IntegerVector x, int turns) {
   int tmp;
   for (int turn = l; turn < turns; turn++) {
     tmp = last;
-    last = (diff_time[tmp]) ? (turn - diff_time[tmp]) : 0;
+    // last = (diff_time[tmp]) ? (turn - diff_time[tmp]) : 0;
+    last = bool(diff_time[tmp]) * (turn - diff_time[tmp]);
     diff_time[tmp] = turn;
   }
   return last;

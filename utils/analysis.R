@@ -13,6 +13,8 @@ times <- mapply(\(f,d) {
 times[,`:=`(time = as_bench_time(time), iter = as.integer(as.factor(date)))]
 setkey(times, iter)
 
+html_graphs()
+
 # Plot all times on all days in log scale to see improvements
 ggplot(times, aes(iter, time, group=day, color=day)) + geom_line() + geom_point() +
   theme(legend.text=element_text(size=6), legend.key.height = unit(5,'mm'), legend.position = 'bottom') + 

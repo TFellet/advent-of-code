@@ -2,7 +2,7 @@ library(data.table)
 a <- fread(fp('2021','12'),sep='-',header=F)
 a <- rbind(a, a[,.(V2,V1)],use.names=F)[V2 != 'start' & V1 != 'end'] # Duplicate connexions and filter useless entries
 
-lastName <- \(dt) tail(names(dt),1)
+lastName <- \(dt) {n <- names(dt);n[length(n)]}
 
 # Part 1
 b <- a[V1=='start'] # Starting table
@@ -13,17 +13,17 @@ while(nrow(b) > 0) { # While there is paths to explore
   setnames(b, paste0('V',1:ncol(b))) # Change names
   setkeyv(b, lastName(b)) # Last col as index
   last <- lastName(b) # Last column
-  ends <- b[,..last][[1]] == 'end' # Number of paths ending
+  ends <- b[[last]] == 'end' # Number of paths ending
   if(sum(ends) > 0) { # If there is any ending paths
     paths <- paths + sum(ends) # Increase counter of paths
     b <- b[!ends] # Remove ending paths from table
   }
-  if(ncol(b) > 3) { # After 2 loops 
+  if(ncol(b) > 3) { # After 2 loops
     filter <- F # By default, keep all lines
     for (v in 2:(ncol(b)-2)) { # For each cave explored
-      filter <- filter | (b[,..v][[1]] == b[,..last][[1]]) # Check if cave has already been visited
+      filter <- filter | (b[[v]] == b[[last]]) # Check if cave has already been visited
     }
-    filter <- filter & (tolower(b[,..last][[1]]) == b[,..last][[1]]) # Filter only small caves already visited
+    filter <- filter & (stringi::stri_trans_tolower(b[[last]]) == b[[last]]) # Filter only small caves already visited
     b <- b[!filter] # Remove invalid paths
   }
 }
@@ -47,10 +47,11 @@ while(nrow(b) > 0) { # While there is paths to explore
     setkeyv(b, lastName(b))
   }
   if(ncol(b) > 4) {
-    last_col <- tolower(b[[last]]) # Last column
+    last_col <- b[[last]] # Last column
     filter <- b[,V0] # Init filter with previous value from table
+    is_min <- grepl('[a-z]', last_col, perl = T)
     for (v in 3:(ncol(b)-2)) {
-      filter <- filter + (b[[v]] == last_col) # Add number of already visited small caves 
+      filter <- filter + (is_min & b[[v]] == last_col) # Add number of already visited small caves
     }
     b[,V0 := filter] # Update filter in table
     b <- b[filter <= 1] # Remove invalid paths

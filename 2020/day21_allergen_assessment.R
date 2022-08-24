@@ -40,4 +40,4 @@ for (i in 1:(n-1)) { # For each allergen
 corresp[n,] <- filter_ing2 # Add last pair
 
 # Part 2 (cljf,frtfg,vvfjj,qmrps,hvnkk,qnvx,cpxmpc,qsjszn): Ingredients ordered by contained allergens
-stringi::stri_flatten(radsort(corresp[,1], by=corresp[,2]), ',')
+stringi::stri_flatten(isort(corresp[,1], by=corresp[,2]), ',')

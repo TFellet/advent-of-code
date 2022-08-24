@@ -42,7 +42,7 @@ gameP2 <- \(p1, p2, first=T) {
     recur <- length(p1)>n1 && length(p2)>n2 # Recursion possible
     # Find the winner either with the highest card, or with a sub game
     w <- if(!recur) n1>n2 else Recall(p1[2:(n1+1L)], p2[2:(n2+1L)], F)
-    
+
     if(w) { # P1 win
       p1 <- c(p1[-1L], n1,n2) # P1 new deck
       if(length(p2) == 1L) return(if(first) p1 else T) # If P2 has no more cards, P1 wins
