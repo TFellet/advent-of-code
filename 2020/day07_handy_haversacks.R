@@ -37,3 +37,4 @@ part2 <- \(ref, first='shiny gold') {
   total
 }
 part2(full_list) # Part 2 (50100): How many individual bags are required inside your single shiny gold bag
+

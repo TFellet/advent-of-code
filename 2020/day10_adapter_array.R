@@ -1,5 +1,5 @@
 a <- strtoi(rfp('2020','10'))
-a2 <- isort(a) # Sort numbers
+a2 <- radsort(a) # Sort numbers
 
 diffs <- c(a2, a2[length(a2)]+3L)-c(0L, a2) # Differences with previous number
 prod(tabulate(diffs)[-2L]) # Part 1 (2738): Product of frequencies of 3's and 1's

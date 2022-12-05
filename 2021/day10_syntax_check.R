@@ -10,7 +10,7 @@ parseLines <- \(am) {
   
   comps <- list() # List of symbols to complete
   errs <- c() # List of errors
-  for (line in 1:length(am)) { # For each line
+  for (line in seq_along(am)) { # For each line
     seen <- c() # Keep track on seen brackets
     i <- 1 # Set pointer on seen to 1
     l <- am[[line]] # Get line

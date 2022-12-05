@@ -6,7 +6,7 @@ rulesl <- data.table::tstrsplit(file[-(1:2)], ' ', keep = c(1,3), fixed=T)
 rules <- list(inp = rep(rulesl[[1]],2))
 rules[['out']] <- c(stringi::stri_c(substr(rulesl[[1]],1,1),rulesl[[2]]), stringi::stri_c(rulesl[[2]], substr(rulesl[[1]],2,2)))
 
-un <- isort(kit::funique(c(rules$inp, rules$out))) # All unique pairs present
+un <- radsort(kit::funique(c(rules$inp, rules$out))) # All unique pairs present
 poly <- Rfast::Table(stringi::stri_c(temp[-length(temp)],temp[-1])) # Starting pairs
 start <- `names<-`(rep(0,length(un)), un) # Empty vector with all combinasons of letters
 start[names(poly)] <- poly # Assign numbers from input

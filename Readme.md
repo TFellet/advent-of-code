@@ -6,4 +6,4 @@ Year 2020 runs in 1.2 sec, with days 15, 23 and 25 written in Rust, and approxim
 
 Year 2021 runs in 13 sec (only R).
 
-Detail of runtime is present in each repository.
+Detail of runtime is present in each folder.

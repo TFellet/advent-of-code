@@ -1,6 +1,6 @@
 import re
 import numpy as np
-with open('../inputs/day2.txt','r') as fi: a = fi.readlines()
+with open('2020/inputs/day2.txt','r') as fi: a = fi.readlines()
 
 r=re.compile('(\d+)-(\d+) (.): (.*)')
 res = np.array([re.match(r, x).groups() for x in a], dtype=np.dtype('int,int,U1,U20'))

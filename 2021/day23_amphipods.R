@@ -34,7 +34,7 @@ solve <- \(p2 = F, example = F) {
       for (i in nei) expco(id0, i, co+1L, visitid) # Recursive explore neighbours
     }
     
-    for (id in 1:length(state)) { # For each "from" in the state
+    for (id in seq_along(state)) { # For each "from" in the state
       id0 <- id; visit <- rep(F,length(state)); co <- 0L
       visit[id] <- T # Current id is visited
       mm[id0, id,] <- visit # Store the mask (T/F) in the matrix
@@ -43,7 +43,7 @@ solve <- \(p2 = F, example = F) {
       for (i in nei) expco(id0, i, co+1L, visit) # Explore each neighbour
       mm[id0,,id0] <- F # Remove "from" from mask 
     }
-    for (i in 1:length(state)) ml[[i]] <- mm[i,,] # Convert matrix to list
+    for (i in seq_along(state)) ml[[i]] <- mm[i,,] # Convert matrix to list
     return(list(ml, mc))
   }
   

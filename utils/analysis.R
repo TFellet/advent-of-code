@@ -2,7 +2,7 @@ library(data.table)
 library(bench)
 library(ggplot2)
 
-year <- '2020'
+year <- '2019'
 files <- list.files(paste0(year, '/benchs/times'), full.names = T, '^d\\d')
 dates <- file.info(files)[['mtime']]
 
@@ -17,7 +17,7 @@ html_graphs()
 
 # Plot all times on all days in log scale to see improvements
 ggplot(times, aes(iter, time, group=day, color=day)) + geom_line() + geom_point() +
-  theme(legend.text=element_text(size=6), legend.key.height = unit(5,'mm'), legend.position = 'bottom') + 
+  theme(legend.text=element_text(size=6), legend.key.height = unit(5,'mm'), legend.position = 'bottom') +
   guides(fill=guide_legend(ncol=1))
 
 # Minimum recorded times for each day

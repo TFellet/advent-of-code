@@ -8,7 +8,7 @@ r0id <- collapse::whichv(rules_ids, '0') # Find rule 0 (final rule to test)
 r0 <- rules[r0id]
 rules <- rules[-r0id] # Remove rule 0 from list of rules
 rules_ids <- strtoi(rules_ids[-r0id]) # Convert ids to int
-ord <- iorder(rules_ids) # Sort ids
+ord <- radorder(rules_ids) # Sort ids
 rules_ord <- rep('', max(rules_ids)) # Init empty list (for examples to work)
 rules_ord[rules_ids[ord]] <- paste0('( ', rules[ord], ' )') # Fill empty list with correctly ordered rules and add parenthesis
 

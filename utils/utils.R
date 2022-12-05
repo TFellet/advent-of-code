@@ -1,17 +1,22 @@
-#' @export
 #' Use internal paste without any checks to gain speed
+#' @export
 fp <- \(y, d) .Internal(paste0(list(y, '/inputs/day', d, '.txt'), NULL, FALSE))
 
-#' @export
 #' Use brio instead of readLines
+#' @export
 rfp <- \(y, d,...) brio::read_lines(fp(y,d), ...)
 
-#' @export
 #' Shortcut for scan without print
+#' @export
 sfp <- \(y, d,...) scan(fp(y,d),quiet=T, ...)
 
-#' @export
 #' Convert a vector of strings to a matrix of strings or ints
+#' @param a Input vector
+#' @param w Desired width of the matrix
+#' @param int Convert the matrix to int
+#' @param sep Separator inside the strings
+#' @return A matrix with dimensions length(a) * w
+#' @export
 toGrid <- \(a, w=0, int=T, sep='') {
   spl <- strsplit(a, sep, fixed = T) # Split at each separator, or each char
   if(!w) w <- length(spl[[1]]) # If width is not set, default is at length of first line
@@ -20,34 +25,30 @@ toGrid <- \(a, w=0, int=T, sep='') {
   matrix(spl, ncol = w, byrow = T) # Create a matrix by row
 }
 
+#' Get last value of vector
 #' @export
-#' Shortcut for collaspe radixsort
-radsort <- \(x, by=x, ...) x[collapse::radixorder(by, ...)]
+flast <- \(x) x[[length(x)]]
 
-#' @export
 #' Fast internal radix sort without any checks
-isort <- \(x, by=x) x[.Internal(radixsort(F, F, FALSE, TRUE, by))]
-
 #' @export
+radsort <- \(x, by=x) x[.Internal(radixsort(F, F, FALSE, TRUE, by))]
+
 #' Fast internal radix sort without any checks
-iorder <- \(x) .Internal(radixsort(F, F, FALSE, TRUE, x))
-
 #' @export
-#' Fast internal sort without any checks
-isort2 <- \(x, by=x) x[.Internal(order(F, F, by))]
+radorder <- \(x) .Internal(radixsort(F, F, FALSE, TRUE, x))
 
-#' @export
 #' Fast version of table()
+#' @export
 fTable <- \(x) attr(.Call(collapse:::C_group, x, F, T), 'group.sizes', T)
 
-#' @export
 #' Repeat each element in x n times faster than rep(x, each=n)
+#' @export
 frepEach <- \(x,n) {
   matrix(x,nrow = n, ncol=length(x),byrow = T) |> `dim<-`(NULL)
 }
 
-#' @export
 #' Convert a matrix to integer
+#' @export
 matToInt <- \(mat) {
   d <- dim(mat)
   strtoi(mat) |> `dim<-`(d)
@@ -56,19 +57,19 @@ matToInt <- \(mat) {
 #' @export
 `%=%` <- collapse::`%=%` # Multiple assign
 
-#' @export
 #' Convert arguments to data table
+#' @export
 fDT <- \(...) collapse::qDT(list(...))
 
-#' @export
 #' Count the number of times a value appears
+#' @export
 countFilter <- \(x,val) {
   tmp <- kit::countOccur(x) # Tabulate each value
   tmp$Variable[tmp$Count == val] # Filter on specified value
 }
 
-#' @export
 #' For a given matrix, compute indices where each of the 4/8/9 neighbours of each cell are
+#' @export
 adja <- \(mat, pad=NA, n=4L) {
   mat2 <- seq_along(mat)
   dim(mat2) <- dim(mat)
@@ -76,14 +77,14 @@ adja <- \(mat, pad=NA, n=4L) {
   ind_row <- 2:(nrow(mat) + 1) # row indices of the "middle"
   ind_col <- 2:(ncol(mat) + 1) # column indices of the "middle"
   # Find neighbours in n directions, clockwise, starting from North or row by row for n = 9
-  neigh <- 
+  neigh <-
     if(n==4L)
       cbind(mat.pad[ind_row-1,ind_col  ], # N
             mat.pad[ind_row  ,ind_col+1], # E
             mat.pad[ind_row+1,ind_col  ], # S
             mat.pad[ind_row  ,ind_col-1]) # W
     else if (n==8L)
-      cbind(mat.pad[ind_row-1,ind_col  ], # N  
+      cbind(mat.pad[ind_row-1,ind_col  ], # N
             mat.pad[ind_row-1,ind_col+1], # NE
             mat.pad[ind_row  ,ind_col+1], # E
             mat.pad[ind_row+1,ind_col+1], # SE
@@ -102,16 +103,16 @@ adja <- \(mat, pad=NA, n=4L) {
             mat.pad[ind_row+1,ind_col  ], # S
             mat.pad[ind_row+1,ind_col+1]) # SE
     else stop('Invalid n')
-  
+
   dim(neigh) <- c(length(mat), n) # Reshape matrix to have (n points in original matrix) * (4 directions)
   neigh
 }
 
-#' @export
 #' Function to start a day of advent of code
+#' @export
 setup <- \(y,d) {
   p <- fp(y, d) # Path to input
-  if(!file.exists(p)) dir.create(p, recursive = T)
+  if(!dir.exists(dirname(p))) dir.create(dirname(p), recursive = T)
   session <- Sys.getenv('session') # Token on website
   if(!file.exists(p)) { # Input file not present
     url <- paste0('https://adventofcode.com/', y, '/day/', d, '/input') # Input url
@@ -151,12 +152,12 @@ bench_file <- \(file, memory = F, min_time=1, ...) {
   exp <- bquote(eval(f)) # Add the eval around the code
   exp[[2]] <- f
   # Benchmark the file with bench package
-  bench::mark(exprs = list(exp), memory = memory, min_time=min_time, env=new.env(parent = parent.frame()), ...)[,c(2:9)]
+  bench::mark(exprs = list(exp), memory = memory, min_time=min_time, filter_gc = FALSE, check=F, env=new.env(parent = parent.frame()))[,c(2:9)]
 }
 
-#' @export
 #' When a string of Rust code is run with cargo, a .so file is created
 #' This function copy this file to the specified path
+#' @export
 getRustSo <- \(name, ...) {
   folder <- file.path(tools::R_user_dir("cargo", "cache"), 'roxido', 'rustlib', 'target', 'release')
   files <- list.files(folder, 'so$', full.names = T) |> file.info()
@@ -164,10 +165,18 @@ getRustSo <- \(name, ...) {
   file.copy(last_file, name, ...)
 }
 
-#' @export
 #' From a compiled file (.so or .dll) returns an R function to call it
+#' @export
 importDll <- \(lib_path, fun_name = 'func') {
   dll <- dyn.load(lib_path) # Load previously compiled code
   func <- getNativeSymbolInfo(fun_name, tools::file_path_sans_ext(basename(lib_path))) # Get function name in library
   \(...) .Call(func, ...) # Return R function
 }
+
+#' Source a file into current environment but faster than source
+#' Causes problems with bench::mark
+#' @export
+load <- \(f) brio::read_file(f) |> str2lang() |> eval.parent()
+
+#' @export
+readTxt <- \(txt) { brio::write_file(txt, '/tmp/rtmp'); brio::read_lines('/tmp/rtmp') }
