@@ -29,5 +29,5 @@ for (spl in strsplit(a, ' ', fixed = T)) {
 dir_size2 <- unlist(dir_size) # Flatten the directory sizes into a single vector
 sum(dir_size2[dir_size2 < 100000]) # Part 1 (1307902): sum of the sizes of all directories smaller than 100000
 
-goal_dir <- 30000000 - 70000000 + dir_size2['root'] # Target size for free
+goal_dir <- 30000000 - 70000000 + dir_size2['root'] # Target size to free
 min(dir_size2[dir_size2 > goal_dir]) # Part 2 (7068748): Smallest folder to delete to free up enough space
