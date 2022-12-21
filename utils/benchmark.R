@@ -7,7 +7,7 @@ options(scipen = 50)
 setDTthreads(11L)
 
 
-year <- '2019'
+year <- '2022'
 onlyR <- F
 files <- list.files(year, 'day.*.R$', full.names = T)
 exprs <- map(files, ~parse(file=.x)) # Read and parse all source code files
@@ -29,6 +29,7 @@ times2[,c('result', 'memory', 'gc', 'time', 'gc/sec', 'n_gc') := NULL]
 # Pattern is d{pad]{max_day}_V{version number in max_day}
 folder <- paste0(year, '/benchs/times')
 if(onlyR) folder <- paste0(folder, 'R')
+if(!dir.exists(folder)) dir.create(folder, recursive = T)
 pad <- if(length(exprs)>=10) '' else '0'
 maxd <- paste0('d', pad,length(exprs))
 iter <- length(list.files(folder, pattern = maxd))+1L
