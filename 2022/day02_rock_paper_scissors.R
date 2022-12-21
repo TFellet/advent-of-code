@@ -1,6 +1,6 @@
 a <- sfp('2022','2', what=list('','')) # Read input as 2 lists
-b1 <- fastmatch::fmatch(a2[[1]], c('A','B','C')) # Convert letters to numbers
-b2 <- fastmatch::fmatch(a2[[2]], c('X','Y','Z')) # Convert letters to numbers
+b1 <- fastmatch::fmatch(a[[1]], c('A','B','C')) # Convert letters to numbers
+b2 <- fastmatch::fmatch(a[[2]], c('X','Y','Z')) # Convert letters to numbers
 # Substraction => Determine the outcome of the round
 # Additions and modulo => Get the outcome between 1 and 3
 # Then, get the score of outcome
