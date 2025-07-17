@@ -65,3 +65,25 @@ if(!(exists('onlyR') && onlyR)) {
 # Rcpp::sourceCpp("2020/day15_rambunctious_recitation.cpp")
 # rcppPlay(a, 2020L) # 6.5µs
 # rcppPlay(a, 3e7L) # 440ms
+
+# rustPlay <- cargo::rust_fn(x, turns, '
+#     let x = x.as_vector_or_stop("error").slice_integer().unwrap(); // Declare data as Rust array
+#     let turns = turns.as_usize(); // Declare turns as Rust number
+#     let l = x.len();
+#     let mut diff_time: Vec<i32> = Vec::new(); // Vector to store last spoken turns of each number
+#     diff_time.resize(turns, 0); // Resize to fit all turns
+#     for i in 0..l {
+#         diff_time[x[i] as usize] = i as i32 +1; // Init firsts turns
+#     }
+#     let mut last = x[l-1] as usize; // Last spoken number
+#     let mut tmp;
+#     for turn in l as i32 ..turns as i32 { // For each turn
+#         tmp = last; // Keep track of last number spoken
+#         // Next spoken number is either the turn difference between the previous 2 times it was spoken, or 0 is it\'s a new number
+#         last = if diff_time[tmp]>0 { (turn - diff_time[tmp]) as usize } else { 0 };
+#         diff_time[tmp] = turn; // Store turn spoken of previous number
+#     }
+#     let (res, xres) = RVector::new_integer(1, pc);
+#     xres[0] = last as i32;
+#     res
+# ', verbose=T)

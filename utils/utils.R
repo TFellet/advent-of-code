@@ -43,8 +43,14 @@ fTable <- \(x) attr(.Call(collapse:::C_group, x, F, T), 'group.sizes', T)
 
 #' Repeat each element in x n times faster than rep(x, each=n)
 #' @export
+# frepEach <- \(x,n) {
+#   matrix(x,nrow = n, ncol=length(x),byrow = T) |> `dim<-`(NULL)
+# }
+
+#' Repeat each element in x n times faster than rep(x, each=n)
+#' @export
 frepEach <- \(x,n) {
-  matrix(x,nrow = n, ncol=length(x),byrow = T) |> `dim<-`(NULL)
+  rep(x, rep(n,length(x)))
 }
 
 #' Convert a matrix to integer
@@ -153,6 +159,35 @@ bench_file <- \(file, memory = F, min_time=1, ...) {
   exp[[2]] <- f
   # Benchmark the file with bench package
   bench::mark(exprs = list(exp), memory = memory, min_time=min_time, filter_gc = FALSE, check=F, env=new.env(parent = parent.frame()))[,c(2:9)]
+}
+
+#' @export
+#' Time the execution of a complete file
+bench_file2 <- \(file, memory = F, min_time=1, ...) {
+  # memory = F
+  # min_time=1
+  # file='2022/day09_rope_bridge.R'
+  # f='2022/day01_calorie_counting.R'
+  invisible(compiler::cmpfile(file, '/tmp/rcmp.Rc', options = list(optimize=3)))
+  # compiler::loadcmp('/tmp/rcmp.Rc') |> ti()
+  # file='/tmp/rcmp.Rc'
+  exprs <- .Internal(load.from.file('/tmp/rcmp.Rc'))
+  env <- new.env()
+  ev <- \(exprs, envir) {
+    for (i in exprs) {
+      eval(i, envir)
+    }
+  }
+  # ev(exprs, env) |> ti()
+  # brio::read_file_raw(file)
+  # f <- parse(file=file) # Parse file content
+  # exp <- bquote(eval(f)) # Add the eval around the code
+  # exp[[2]] <- f
+  # eval(as.call(f))
+  # exp <- bquote(eval(\(){f}())) # Add the eval around the code
+  # exp[[2]][[3]][[1]][[2]] <- f
+  # Benchmark the file with bench package
+  bench::mark(ev(exprs, env), memory = memory, min_time=min_time, filter_gc = FALSE, check=F, env=new.env())[,c(2:9)]
 }
 
 #' When a string of Rust code is run with cargo, a .so file is created
