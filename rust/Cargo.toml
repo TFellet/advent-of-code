@@ -1,0 +1,8 @@
+[package]
+name = "adv_test"
+version = "0.0.1"
+authors = [""]
+
+[[bin]]
+name = "adv_test"
+path = "test.rs"
