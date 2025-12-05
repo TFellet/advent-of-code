@@ -5,16 +5,14 @@ ranges, ids = (d.split("\n") for d in data)
 rt = [list(map(int, r.split("-"))) for r in ranges]
 
 # Sort and reduce number of ranges by merging overlapping ones
-new_ranges = []
 srt = sorted(rt, key=lambda x: x[0])
-for r in srt:
-    include = True
-    for nr in new_ranges:
-        # Ranges are sorted, so r[0] is always >= nr[0]
-        if r[0] <= nr[1]: # If the left bound is in the current range
-            nr[1] = max(nr[1], r[1]) # Extend the current range to the max right bound of both ranges
-            include = False # Current range is already accounted for, don't append it to the list of ranges
-    if include: # Append to the list of non overlaping ranges
+new_ranges = [srt[0]]
+for r in srt[1:]:
+    nr = new_ranges[len(new_ranges)-1]
+    # Ranges are sorted, so r[0] is always >= nr[0]
+    if r[0] <= nr[1]: # If the left bound is in the current range
+        nr[1] = max(nr[1], r[1]) # Extend the current range to the max right bound of both ranges
+    else:
         new_ranges.append(r)
 
 # Use binary search to find if a number belongs to a range
