@@ -3,9 +3,8 @@ from collections import Counter
 
 from scipy.cluster.hierarchy import DisjointSet
 
-data = open("2025/inputs/day8.txt").readlines()
 # Read points into int tuples
-data_int = [tuple(map(int, r.split(","))) for r in data]
+data_int = [tuple(map(int, r.split(","))) for r in open("2025/inputs/day8.txt")]
 le = len(data_int)
 
 ## Approach 1: Dictionnary implementation

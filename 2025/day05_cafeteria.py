@@ -1,8 +1,7 @@
 from bisect import bisect_left
 
-data = open("2025/inputs/day5.txt").read().strip().split("\n\n")
-ranges, ids = (d.split("\n") for d in data)
-rt = [list(map(int, r.split("-"))) for r in ranges]
+ranges, ids = open("2025/inputs/day5.txt").read().strip().split("\n\n")
+rt = [list(map(int, r.split("-"))) for r in ranges.splitlines()]
 
 # Sort and reduce number of ranges by merging overlapping ones
 srt = sorted(rt, key=lambda x: x[0])
@@ -21,5 +20,5 @@ def in_range(target, ranges, starts) -> bool:
     return ranges[i][0] <= target <= ranges[i][1]
 
 starts = [x[0] for x in new_ranges]
-sum(in_range(int(id), new_ranges, starts) for id in ids) # Part 1
+sum(in_range(int(id), new_ranges, starts) for id in ids.splitlines()) # Part 1
 sum(r[1] - r[0] + 1 for r in new_ranges) # Part 2

@@ -1,9 +1,11 @@
 from collections import defaultdict
 
-data = open("2025/inputs/day7.txt").readlines()
+data = open("2025/inputs/day7.txt").read().splitlines()
 p1 = 0
 beams = {data[0].index("S"): 1}
 for r in data[1:]:
+    if r.find("^") == -1:
+        continue
     row_beams = defaultdict(int)
     for beam in beams:
         if r[beam] == "^":
@@ -15,8 +17,8 @@ for r in data[1:]:
     beams = row_beams
 p1, sum(beams.values())
 
-# Alternative solution using a single array instead of a dict
-data = open("2025/inputs/day7.txt").readlines()
+# Alternative solution using a single array instead of a dict (faster)
+data = open("2025/inputs/day7.txt").read().splitlines()
 paths = [0] * len(data[0])
 paths[data[0].index("S")] = 1
 p1 = 0

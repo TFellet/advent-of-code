@@ -1,7 +1,16 @@
 import numpy as np
 
-data = open("2025/inputs/day9.txt").readlines()
-data = [tuple(map(int, r.split(","))) for r in data]
+data = [tuple(map(int, x.split(','))) for x in open("2025/inputs/day9.txt")]
+
+area_list = []
+for i in range(len(data)):
+    for j in range(i + 1, len(data)):
+        # xi, xj, yi, yj = data[i][0], data[j][0], data[i][1], data[j][1]
+        (xi, yi), (xj, yj) = data[i], data[j]
+        area = (abs(xi - xj) + 1) * (abs(yi - yj) + 1)
+        area_list.append((area, (i, j)))
+# 4776487744
+
 # "Compress" the coordinates by mapping each unique x and y coordinate to an integer index
 mapx = {k: v for v, k in enumerate(sorted(set([r[0] for r in data])))}
 mapy = {k: v for v, k in enumerate(sorted(set([r[1] for r in data])))}
@@ -9,17 +18,6 @@ revertx = {v: k for k, v in mapx.items()}
 reverty = {v: k for k, v in mapy.items()}
 data2 = [(mapx[x], mapy[y]) for x, y in data]
 data = data2
-
-max_area = 0
-for i in range(len(data)):
-    for j in range(i + 1, len(data)):
-        area = abs((revertx[data[i][0]] - revertx[data[j][0]]) + 1) * abs(
-            (reverty[data[i][1]] - reverty[data[j][1]]) + 1
-        )
-        if area > max_area:
-            max_area = area
-max_area  # 4776487744
-
 lx = max(data, key=lambda x: x[0])[0] + 1
 ly = max(data, key=lambda x: x[1])[1] + 1
 le = max([lx, ly])
@@ -45,26 +43,25 @@ for i in range(len(data)):
         maxy[x1:x2] = np.maximum(maxy[x1:x2], y1)
 
 # Find the largest rectangle that fits inside the shape S
+area_sorted = sorted(area_list, key=lambda x: x[0], reverse=True)
+# area_sorted = sorted(area_list, reverse=True)
 max_area2 = 0
-for i in range(len(data)):
-    for j in range(i + 1, len(data)):
-        x1, y1 = data[i]
-        x2, y2 = data[j]
-        if x1 > x2:
-            x1, x2 = x2, x1
-        if y1 > y2:
-            y1, y2 = y2, y1
-        x2 += 1
-        y2 += 1
-        if ( # Check if the contour of the rectangle is completely inside the shape S
-            np.all(minx[y1:y2] <= x1)
-            and np.all(maxx[y1:y2] >= x2)
-            and np.all(miny[x1:x2] <= y1)
-            and np.all(maxx[y1:y2] >= x2)
-        ):
-            area = (revertx[x2 - 1] - revertx[x1] + 1) * (reverty[y2 - 1] - reverty[y1] + 1)
-            if area > max_area2:
-                max_area2 = area
-max_area2
-# 1560299548
+for area, (i, j) in area_sorted:
+    x1, y1 = data[i]
+    x2, y2 = data[j]
+    if x1 > x2:
+        x1, x2 = x2, x1
+    if y1 > y2:
+        y1, y2 = y2, y1
+    x2 += 1
+    y2 += 1
+    if (  # Check if the contour of the rectangle is completely inside the shape S
+        np.all(minx[y1:y2] <= x1)
+        and np.all(maxx[y1:y2] >= x2)
+        and np.all(miny[x1:x2] <= y1)
+        and np.all(maxx[y1:y2] >= x2)
+    ):
+        max_area2 = area
+        break
+area_sorted[0][0], max_area2
 # 1560299548
