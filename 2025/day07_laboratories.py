@@ -2,7 +2,7 @@ from collections import defaultdict
 
 data = open("2025/inputs/day7.txt").read().splitlines()
 p1 = 0
-beams = {data[0].index("S"): 1}
+beams = {data[0].find("S"): 1}
 for r in data[1:]:
     if r.find("^") == -1:
         continue
@@ -20,15 +20,14 @@ p1, sum(beams.values())
 # Alternative solution using a single array instead of a dict (faster)
 data = open("2025/inputs/day7.txt").read().splitlines()
 paths = [0] * len(data[0])
-paths[data[0].index("S")] = 1
+paths[data[0].find("S")] = 1
 p1 = 0
 for r in data[1:]:
-    if (st := r.find("^")) == -1:
-        continue
-    for i in range(st, len(paths)):
-        if r[i] == "^":
-            p1 += paths[i] > 0
-            paths[i - 1] += paths[i]
-            paths[i + 1] += paths[i]
-            paths[i] = 0
+    i = 0
+    while (i := r.find("^", i)) != -1:
+        p1 += paths[i] > 0
+        paths[i - 1] += paths[i]
+        paths[i + 1] += paths[i]
+        paths[i] = 0
+        i += 1
 p1, sum(paths) # (1638, 7759107121385)
